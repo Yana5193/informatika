@@ -1,24 +1,27 @@
 # БД "Продажи в магазине"
 Запросы:
 ### 1)в окне «Новая продажа»
+
 SELECT id_product, name_product, price, quanite_at_strogare 
 FROM products
+
 ### 2)Создание нового чека
 INSERT INTO receipts (created_at, id_cashier) 
 VALUES (?, ?)
+
 ### 3)Добавление купленного товара в чек
 INSERT INTO sale_items (id_check, id_product, quantity) 
 VALUES (?, ?, ?)
+
 ### 4)Списание товара со склада
 UPDATE products 
 SET quanite_at_strogare = quanite_at_strogare - ? 
 WHERE id_product = ?
+
 ### 5)Основной запрос отчёта (продажи по товарам)
 
 SELECT p.name_product,
-
        SUM(s.quantity) as total_qty, 
-       
        SUM(p.price * s.quantity) as total_sum
        
 FROM sale_items s
