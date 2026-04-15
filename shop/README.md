@@ -14,18 +14,31 @@ UPDATE products
 SET quanite_at_strogare = quanite_at_strogare - ? 
 WHERE id_product = ?
 ### 5)Основной запрос отчёта (продажи по товарам)
-SELECT p.name_product, 
+
+SELECT p.name_product,
+
        SUM(s.quantity) as total_qty, 
+       
        SUM(p.price * s.quantity) as total_sum
+       
 FROM sale_items s
+
 JOIN products p ON p.id_product = s.id_product
+
 JOIN receipts r ON r.id_check = s.id_check
+
 WHERE DATE(r.created_at) = ?
+
 GROUP BY p.name_product
+
 ORDER BY total_sum DESC
 ### 6)Запрос для общей выручки за день
 SELECT SUM(p.price * s.quantity)
+
 FROM sale_items s
+
 JOIN products p ON p.id_product = s.id_product
+
 JOIN receipts r ON r.id_check = s.id_check
+
 WHERE DATE(r.created_at) = ?
