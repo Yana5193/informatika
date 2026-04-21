@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS sale_items (
 );
 """)
 try:
-    mg = load_workbook("C:/Users/anaer/OneDrive/Desktop/inform/магазин/mg.xlsx", 
+    mg = load_workbook("C:/Users/anaer/OneDrive/Desktop/учеба/ИГУ/1 курс 2 семестр/информатика/магазин/mg.xlsx", 
                        read_only=True, data_only=True)
     sheet = mg["categories"]
     for row in sheet.iter_rows(min_row=2, values_only=True):
@@ -155,6 +155,14 @@ def open_new_sale():
 
         qty_entry.delete(0, tk.END)
         qty_entry.insert(0, "1")
+    def remove_from_cart():
+        selected = cart_tree.focus() 
+        if not selected:
+            messagebox.showwarning("Внимание", "Выберите товар в корзине для удаления!")
+            return
+        item_index = cart_tree.index(selected)
+        cart.pop(item_index)
+        cart_tree.delete(selected)
 
     def punch_check():
         if not cart:
@@ -201,6 +209,8 @@ def open_new_sale():
 
     tk.Button(btn_frame, text="Добавить в корзину", font=("Arial", 12), width=22, height=2,
               bg="#B39DFF", fg="white", command=add_to_cart).pack(side="left", padx=20)
+    tk.Button(btn_frame,text="Удалить из корзины",font=("Arial",12,"bold"),width=22,height=2,
+              bg="#B39DFF",fg="white",command=remove_from_cart).pack(side="left",padx=20)
 
     tk.Button(btn_frame, text="Пробить чек", font=("Arial", 12, "bold"), width=22, height=2,
               bg="#8A6CFF", fg="white", command=punch_check).pack(side="left", padx=20)
@@ -226,8 +236,6 @@ def show_reports():
     def generate():
         date = date_entry.get().strip()
         result_text.delete("1.0", tk.END)
-
-        # 1. Продажи по каждому товару
         cursor.execute("""
             SELECT p.name_product, 
                    SUM(s.quantity) as total_qty, 
@@ -251,7 +259,6 @@ def show_reports():
             result_text.insert(tk.END, 
                 f"{name:<38} {qty:>12.2f} {total or 0:>20.2f} руб.\n")
 
-        # 2. Общая выручка за день — отдельным простым запросом
         cursor.execute("""
             SELECT SUM(p.price * s.quantity)
             FROM sale_items s
@@ -267,6 +274,116 @@ def show_reports():
 
     tk.Button(report_window, text="Сформировать отчёт", font=("Arial", 12), 
               bg="#B39DFF", fg="white", command=generate).pack(pady=10)
+    
+def show_sklad():
+    sklad_window = tk.Toplevel(root)
+    sklad_window.title("Склад и управление остатками")
+    sklad_window.geometry("900x750")
+    sklad_window.configure(bg="#E6D9FF")
+
+    tk.Label(sklad_window, text="⚠️ Топ-5 товаров с малым остатком", 
+             font=("Arial", 14, "bold"), bg="#E6D9FF", fg="#D32F2F").pack(pady=10)
+
+    low_stock_columns = ("ID", "Название", "Остаток")
+    low_stock_tree = ttk.Treeview(sklad_window, columns=low_stock_columns, show="headings", height=5)
+    for col in low_stock_columns:
+        low_stock_tree.heading(col, text=col)
+        low_stock_tree.column(col, width=200)
+    low_stock_tree.pack(padx=20, pady=5)
+
+    def load_low_stock():
+        low_stock_tree.delete(*low_stock_tree.get_children())
+        # Берем 5 товаров, где остаток меньше всего (сортировка по возрастанию)
+        cursor.execute("SELECT id_product, name_product, quanite_at_strogare FROM products ORDER BY quanite_at_strogare ASC LIMIT 5")
+        for row in cursor.fetchall():
+            low_stock_tree.insert("", "end", values=row)
+
+    load_low_stock()
+
+    tk.Frame(sklad_window, height=2, bd=1, relief="sunken", bg="grey").pack(fill="x", padx=50, pady=20)
+    tk.Label(sklad_window, text="➕ Добавить новый товар", 
+             font=("Arial", 14, "bold"), bg="#E6D9FF", fg="#5A3D8C").pack(pady=5)
+
+    add_frame = tk.Frame(sklad_window, bg="#E6D9FF")
+    add_frame.pack(pady=10)
+
+    labels = ["Название:", "Цена:", "Категория (ID):", "Количество:"]
+    entries = []
+    for i, text in enumerate(labels):
+        tk.Label(add_frame, text=text, bg="#E6D9FF", font=("Arial", 11)).grid(row=i, column=0, sticky="e", padx=5, pady=5)
+        entry = tk.Entry(add_frame, width=30)
+        entry.grid(row=i, column=1, padx=5, pady=5)
+        entries.append(entry)
+
+    ent_name, ent_price, ent_cat, ent_qty = entries
+
+    def add_product():
+        name = ent_name.get()
+        try:
+            price = float(ent_price.get())
+            cat_id = int(ent_cat.get())
+            qty = float(ent_qty.get())
+            
+            if not name: raise ValueError
+
+            cursor.execute("""
+                INSERT INTO products (name_product, price, id_category, quanite_at_strogare) 
+                VALUES (?, ?, ?, ?)
+            """, (name, price, cat_id, qty))
+            
+            connection.commit()
+            messagebox.showinfo("Успех", f"Товар '{name}' добавлен!")
+            
+            for e in entries: e.delete(0, tk.END)
+            load_low_stock()
+            
+        except ValueError:
+            messagebox.showerror("Ошибка", "Проверьте правильность заполнения полей!")
+        except sqlite3.Error as e:
+            messagebox.showerror("Ошибка БД", f"Не удалось добавить: {e}")
+
+    tk.Button(sklad_window, text="Сохранить товар", font=("Arial", 12, "bold"), 
+              bg="#8A6CFF", fg="white", width=20, command=add_product).pack(pady=15)
+
+    tk.Frame(sklad_window, height=2, bd=1, relief="sunken", bg="grey").pack(fill="x", padx=50, pady=20)
+    tk.Label(sklad_window, text="📦 Пополнение запасов (уже существующих)", 
+             font=("Arial", 14, "bold"), bg="#E6D9FF", fg="#2E7D32").pack(pady=5)
+
+    refill_frame = tk.Frame(sklad_window, bg="#E6D9FF")
+    refill_frame.pack(pady=10)
+
+    tk.Label(refill_frame, text="ID товара:", bg="#E6D9FF").grid(row=0, column=0, padx=5)
+    ent_refill_id = tk.Entry(refill_frame, width=10)
+    ent_refill_id.grid(row=0, column=1, padx=5)
+
+    tk.Label(refill_frame, text="Сколько привезли:", bg="#E6D9FF").grid(row=0, column=2, padx=5)
+    ent_refill_qty = tk.Entry(refill_frame, width=10)
+    ent_refill_qty.grid(row=0, column=3, padx=5)
+
+    def refill_stock():
+        try:
+            p_id = int(ent_refill_id.get())
+            add_qty = float(ent_refill_qty.get())
+            
+            cursor.execute("SELECT name_product FROM products WHERE id_product = ?", (p_id,))
+            product = cursor.fetchone()
+
+            if product:
+                cursor.execute("UPDATE products SET quanite_at_strogare = quanite_at_strogare + ? WHERE id_product = ?", 
+                               (add_qty, p_id))
+                connection.commit()
+                messagebox.showinfo("Готово", f"Запасы товара '{product[0]}' пополнены на {add_qty}")
+                ent_refill_id.delete(0, tk.END)
+                ent_refill_qty.delete(0, tk.END)
+                load_low_stock()
+            else:
+                messagebox.showerror("Ошибка", "Товар с таким ID не найден!")
+        except:
+            messagebox.showerror("Ошибка", "Введите числа в поля ID и Количество!")
+
+    tk.Button(sklad_window, text="Принять поставку", font=("Arial", 12, "bold"), 
+              bg="#4CAF50", fg="white", width=25, command=refill_stock).pack(pady=15)
+    
 root = tk.Tk()
 root.title("Магазин")
 root.geometry("650x480")
@@ -277,5 +394,7 @@ tk.Button(root, text="Новая продажа", font=("Arial", 14), width=28, 
           bg="#B39DFF", fg="white", command=open_new_sale).pack(pady=20)
 tk.Button(root, text="Отчёты", font=("Arial", 14), width=28, height=3,
           bg="#B39DFF", fg="white", command=show_reports).pack(pady=15)
+tk.Button(root, text="Склад", font=("Arial", 14), width=28, height=3,
+          bg="#B39DFF", fg="white", command=show_sklad).pack(pady=15)
 root.mainloop()
 connection.close()
