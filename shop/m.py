@@ -281,7 +281,7 @@ def show_sklad():
     sklad_window.geometry("900x750")
     sklad_window.configure(bg="#E6D9FF")
 
-    tk.Label(sklad_window, text="⚠️ Топ-5 товаров с малым остатком", 
+    tk.Label(sklad_window, text=" Топ-5 товаров с малым остатком", 
              font=("Arial", 14, "bold"), bg="#E6D9FF", fg="#D32F2F").pack(pady=10)
 
     low_stock_columns = ("ID", "Название", "Остаток")
@@ -293,7 +293,6 @@ def show_sklad():
 
     def load_low_stock():
         low_stock_tree.delete(*low_stock_tree.get_children())
-        # Берем 5 товаров, где остаток меньше всего (сортировка по возрастанию)
         cursor.execute("SELECT id_product, name_product, quanite_at_strogare FROM products ORDER BY quanite_at_strogare ASC LIMIT 5")
         for row in cursor.fetchall():
             low_stock_tree.insert("", "end", values=row)
@@ -301,7 +300,7 @@ def show_sklad():
     load_low_stock()
 
     tk.Frame(sklad_window, height=2, bd=1, relief="sunken", bg="grey").pack(fill="x", padx=50, pady=20)
-    tk.Label(sklad_window, text="➕ Добавить новый товар", 
+    tk.Label(sklad_window, text=" Добавить новый товар", 
              font=("Arial", 14, "bold"), bg="#E6D9FF", fg="#5A3D8C").pack(pady=5)
 
     add_frame = tk.Frame(sklad_window, bg="#E6D9FF")
@@ -346,7 +345,7 @@ def show_sklad():
               bg="#8A6CFF", fg="white", width=20, command=add_product).pack(pady=15)
 
     tk.Frame(sklad_window, height=2, bd=1, relief="sunken", bg="grey").pack(fill="x", padx=50, pady=20)
-    tk.Label(sklad_window, text="📦 Пополнение запасов (уже существующих)", 
+    tk.Label(sklad_window, text=" Пополнение запасов (уже существующих)", 
              font=("Arial", 14, "bold"), bg="#E6D9FF", fg="#2E7D32").pack(pady=5)
 
     refill_frame = tk.Frame(sklad_window, bg="#E6D9FF")
