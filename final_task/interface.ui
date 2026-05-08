@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>912</width>
-    <height>767</height>
+    <width>1165</width>
+    <height>790</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,6 +17,24 @@
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QStackedWidget" name="btn_reftesh">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>1147</width>
+        <height>729</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>1147</width>
+        <height>729</height>
+       </size>
+      </property>
       <property name="styleSheet">
        <string notr="true">/* Основной фон окна */
 QMainWindow, QWidget {
@@ -77,31 +95,31 @@ QHeaderView::section {
 }</string>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="1">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>222</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
         <item row="1" column="0">
-         <spacer name="horizontalSpacer_4">
+         <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>296</width>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="2">
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
             <height>20</height>
            </size>
           </property>
@@ -109,6 +127,38 @@ QHeaderView::section {
         </item>
         <item row="1" column="1">
          <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="font">
+             <font>
+              <family>Segoe UI</family>
+              <pointsize>17</pointsize>
+              <italic>true</italic>
+              <bold>true</bold>
+              <underline>false</underline>
+             </font>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="text">
+             <string>Система мониторинга ментального здоровья</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
           <item>
            <widget class="QLabel" name="label">
             <property name="minimumSize">
@@ -120,7 +170,7 @@ QHeaderView::section {
             <property name="font">
              <font>
               <family>Segoe UI</family>
-              <pointsize>18</pointsize>
+              <pointsize>14</pointsize>
               <bold>true</bold>
              </font>
             </property>
@@ -140,20 +190,24 @@ QHeaderView::section {
            </widget>
           </item>
           <item>
-           <spacer name="verticalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
+           <widget class="QLabel" name="label_2">
+            <property name="font">
+             <font>
+              <family>Segoe UI</family>
+              <pointsize>14</pointsize>
+              <bold>true</bold>
+             </font>
             </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>10</width>
-              <height>10</height>
-             </size>
+            <property name="text">
+             <string>Выберите тест:</string>
             </property>
-           </spacer>
+           </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_start_test">
+           <widget class="QComboBox" name="combo_tests"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_worker_start">
             <property name="font">
              <font>
               <family>Segoe UI</family>
@@ -166,33 +220,34 @@ QHeaderView::section {
             </property>
            </widget>
           </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </item>
-        <item row="1" column="2">
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+        <item row="2" column="2">
+         <widget class="QPushButton" name="btn_expert_auth">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>12</pointsize>
+            <bold>true</bold>
+           </font>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>296</width>
-            <height>20</height>
-           </size>
+          <property name="text">
+           <string>Кабинет специалиста</string>
           </property>
-         </spacer>
-        </item>
-        <item row="2" column="1">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>222</height>
-           </size>
-          </property>
-         </spacer>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -379,64 +434,76 @@ QHeaderView::section {
        </layout>
       </widget>
       <widget class="QWidget" name="page_3">
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QLabel" name="lbl_admin_title">
-            <property name="font">
-             <font>
-              <family>Segoe UI</family>
-              <pointsize>16</pointsize>
-             </font>
-            </property>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="1" column="1">
+         <widget class="QLabel" name="lbl_admin_title">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Панель анализа результатов</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="1" column="0">
+           <widget class="QPushButton" name="btn_add_quest">
             <property name="text">
-             <string>Панель анализа результатов</string>
+             <string>Добавить вопрос</string>
             </property>
            </widget>
           </item>
-          <item>
-           <spacer name="horizontalSpacer_2">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="btn_create_test">
+            <property name="text">
+             <string>Добавить тест</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="btn_add_employee">
+            <property name="text">
+             <string>Добавить сотрудника</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <spacer name="verticalSpacer_3">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Vertical</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>40</width>
-              <height>20</height>
+              <width>20</width>
+              <height>40</height>
              </size>
             </property>
            </spacer>
           </item>
-          <item>
-           <widget class="QLineEdit" name="edit_search">
-            <property name="styleSheet">
-             <string notr="true">QLineEdit {
-    background-color: white; 
-    color: black; 
-}</string>
-            </property>
-            <property name="inputMask">
-             <string/>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="readOnly">
-             <bool>false</bool>
-            </property>
-            <property name="placeholderText">
-             <string notr="true" comment="поиск по фамилии"/>
-            </property>
-            <property name="clearButtonEnabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
-        <item>
-         <widget class="QTableWidget" name="table_results">
+        <item row="3" column="2">
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_3"/>
+        </item>
+        <item row="2" column="0" rowspan="2" colspan="3">
+         <widget class="QTableWidget" name="tableWidget">
           <attribute name="horizontalHeaderStretchLastSection">
            <bool>true</bool>
           </attribute>
@@ -462,46 +529,53 @@ QHeaderView::section {
           </column>
          </widget>
         </item>
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="font">
-           <font>
-            <family>Segoe UI</family>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Рекомендации для сотрудников</string>
-          </property>
-         </widget>
+        <item row="0" column="0" rowspan="2" colspan="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_2"/>
         </item>
-        <item>
-         <widget class="QTextBrowser" name="txt_recommendation">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>200</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QPushButton" name="pushButton">
+        <item row="2" column="3">
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="1" column="0">
+           <widget class="QPushButton" name="btn_show_depts">
             <property name="text">
-             <string>Обновить данные</string>
+             <string>Анализ отделов</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QPushButton" name="btn_logout">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="btn_show_dist">
             <property name="text">
-             <string>Выйти в меню</string>
+             <string>Гистограмма</string>
             </property>
            </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="btn_export_pdf">
+            <property name="text">
+             <string>Выгрузить отчет</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <spacer name="verticalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
+        </item>
+        <item row="4" column="3">
+         <widget class="QPushButton" name="btn_logout">
+          <property name="text">
+           <string>Выйти в меню</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -514,7 +588,7 @@ QHeaderView::section {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>912</width>
+     <width>1165</width>
      <height>22</height>
     </rect>
    </property>
