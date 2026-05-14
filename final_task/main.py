@@ -6,13 +6,19 @@ import matplotlib.pyplot as plt
 from PyQt5 import QtWidgets, uic, QtCore
 from fpdf import FPDF
 
-# Пути к файлам
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 def get_path(filename): return os.path.join(BASE_DIR, filename)
 
 def setup_database():
-    conn = sqlite3.connect(get_path('mental_health.db'))
+    db_path = get_path('mental_health.db')
+    # Проверяем, существует ли база, чтобы не дублировать данные при каждом запуске
+    first_run = not os.path.exists(db_path)
+    
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+    
+    # Создание таблиц (ваш существующий код)
     cursor.executescript('''
     CREATE TABLE IF NOT EXISTS Departments (id_dept INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT UNIQUE);
     CREATE TABLE IF NOT EXISTS Employees (id_emp INTEGER PRIMARY KEY AUTOINCREMENT, full_name TEXT, position TEXT, dept_id INTEGER, password TEXT);
@@ -22,11 +28,43 @@ def setup_database():
     CREATE TABLE IF NOT EXISTS Recommendations (id_rec INTEGER PRIMARY KEY AUTOINCREMENT, min_score INTEGER, max_score INTEGER, advice_text TEXT);
     CREATE TABLE IF NOT EXISTS Mental_Scores (id_score INTEGER PRIMARY KEY AUTOINCREMENT, log_id INTEGER, total_points INTEGER, status TEXT);
     ''')
-    
-    cursor.execute("DELETE FROM Recommendations")
-    cursor.executemany("INSERT INTO Recommendations (min_score, max_score, advice_text) VALUES (?,?,?)", 
-                       [(0, 15, 'Все в порядке.'), (16, 30, 'Рекомендуем отдых.'), (31, 100, 'Высокий уровень стресса!')])
-    conn.commit()
+
+    # Если база только что создана, импортируем данные из Excel
+    if first_run:
+        try:
+            excel_file = get_path('employees.xlsx') # УБЕДИТЕСЬ, ЧТО ИМЯ ФАЙЛА СОВПАДАЕТ
+            
+            # 1. Загружаем сотрудников и отделы (Лист "Employees")
+            df_emp = pd.read_excel(excel_file, sheet_name='Employees')
+            for _, row in df_emp.iterrows():
+                cursor.execute("INSERT OR IGNORE INTO Departments (title) VALUES (?)", (row['department'],))
+                cursor.execute("SELECT id_dept FROM Departments WHERE title=?", (row['department'],))
+                d_id = cursor.fetchone()[0]
+                
+                # Используем position как имя, если нет колонки full_name
+                name = row.get('full_name', row['position']) 
+                cursor.execute("INSERT INTO Employees (full_name, position, dept_id, password) VALUES (?,?,?,?)",
+                               (name, row['position'], d_id, str(row['password'])))
+
+            # 2. Загружаем тест и вопросы (Лист "Questions")
+            test_name = "Общий психологический тест"
+            cursor.execute("INSERT OR IGNORE INTO Test_List (test_name) VALUES (?)", (test_name,))
+            cursor.execute("SELECT id_test FROM Test_List WHERE test_name=?", (test_name,))
+            t_id = cursor.fetchone()[0]
+
+            df_quest = pd.read_excel(excel_file, sheet_name='Questions')
+            for _, row in df_quest.iterrows():
+                cursor.execute("INSERT INTO Questions (test_id, quest_text) VALUES (?,?)", (t_id, row['quest_text']))
+
+            # 3. Рекомендации
+            cursor.executemany("INSERT INTO Recommendations (min_score, max_score, advice_text) VALUES (?,?,?)", 
+                               [(0, 15, 'Все в порядке.'), (16, 30, 'Рекомендуем отдых.'), (31, 100, 'Высокий уровень стресса!')])
+            
+            conn.commit()
+            print("Данные из Excel успешно импортированы!")
+        except Exception as e:
+            print(f"Ошибка при импорте Excel: {e}")
+
     return conn
 
 class MentalApp(QtWidgets.QMainWindow):
@@ -70,7 +108,7 @@ class MentalApp(QtWidgets.QMainWindow):
         self.refresh()
         self.btn_reftesh.setCurrentIndex(0)
 
-    # --- ТАБЛИЦА С РАЗГРАНИЧЕНИЕМ ПРАВ ---
+    # ТАБЛИЦА С РАЗГРАНИЧЕНИЕМ ПРАВ
     def update_admin_table(self):
         if not hasattr(self, 'tableWidget'): return
         cursor = self.conn.cursor()
@@ -129,7 +167,7 @@ class MentalApp(QtWidgets.QMainWindow):
         else:
             QtWidgets.QMessageBox.information(self, "Инфо", f"Сотрудник: {name}\nСостояние: {status}")
 
-    # --- АДМИН-ФУНКЦИИ ---
+    #АДМИН-ФУНКЦИИ
     def add_emp(self):
         n, ok1 = QtWidgets.QInputDialog.getText(self, "Менеджер", "ФИО:")
         d, ok2 = QtWidgets.QInputDialog.getText(self, "Менеджер", "Отдел:")
@@ -165,7 +203,7 @@ class MentalApp(QtWidgets.QMainWindow):
                 cursor.execute("INSERT INTO Questions (test_id, quest_text) VALUES (?,?)", (t_id, txt))
                 self.conn.commit()
 
-    # --- ТЕСТИРОВАНИЕ ---
+    # ТЕСТИРОВАНИЕ
     def login_worker(self):
         name = self.combo_users.currentText()
         cursor = self.conn.cursor()
@@ -219,7 +257,7 @@ class MentalApp(QtWidgets.QMainWindow):
             self.btn_create_test.setVisible(role == "Психолог")
             self.btn_add_quest.setVisible(role == "Психолог")
 
-    # --- ГРАФИКИ И PDF ---
+    # ГРАФИКИ И PDF
     def plot_hist(self, save=False):
         cursor = self.conn.cursor()
         cursor.execute("SELECT total_points FROM Mental_Scores")
@@ -260,7 +298,6 @@ class MentalApp(QtWidgets.QMainWindow):
             rows = cursor.fetchall()
             if not rows: return
             
-            # Генерируем картинки
             self.plot_hist(save=True)
             self.plot_pie(save=True)
 
